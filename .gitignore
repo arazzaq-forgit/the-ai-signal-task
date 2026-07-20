@@ -1,0 +1,29 @@
+# Secrets — never commit these
+*.json
+!package.json
+.env
+**/creds*.json
+**/credentials*.json
+**/service-account*.json
+
+# Local pipeline output and state
+data/
+*.db
+*.sqlite
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+venv/
+.venv/
+*.egg-info/
+
+# OS / editor cruft
+.DS_Store
+.vscode/
+.idea/
+
+# Playwright browser binaries (large, machine-specific, reinstall via `playwright install chromium`)
+**/ms-playwright/
