@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Signal — Data Intelligence Pipeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a1120;
+    --surface: #101a2e;
+    --surface-2: #16223a;
+    --hairline: #223250;
+    --text: #e7ecf5;
+    --text-dim: #8c9bb5;
+    --text-faint: #5c6b87;
+    --accent: #e8a33d;
+    --accent-dim: #6b5227;
+    --accent-2: #4fd1c5;
+    --radius: 10px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(232, 163, 61, 0.08), transparent),
+      linear-gradient(var(--hairline) 1px, transparent 1px),
+      linear-gradient(90deg, var(--hairline) 1px, transparent 1px);
+    background-size: auto, 48px 48px, 48px 48px;
+    background-position: 0 0, -1px -1px, -1px -1px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+  }
+
+  .sweep {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.7;
+    animation: sweep 5s linear infinite;
+    z-index: 100;
+  }
+  @keyframes sweep {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sweep { animation: none; opacity: 0.3; }
+    .pulse-dot { animation: none !important; }
+  }
+
+  header {
+    padding: 40px 32px 28px;
+    border-bottom: 1px solid var(--hairline);
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+
+  .wordmark {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 6px;
+  }
+
+  .wordmark h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+
+  .wordmark h1 span { color: var(--accent); }
+
+  .live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--accent-2);
+    text-transform: uppercase;
+    border: 1px solid rgba(79, 209, 197, 0.35);
+    background: rgba(79, 209, 197, 0.08);
+    padding: 4px 10px 4px 8px;
+    border-radius: 100px;
+  }
+
+  .pulse-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent-2);
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(79, 209, 197, 0.5); }
+    50% { opacity: 0.6; box-shadow: 0 0 0 4px rgba(79, 209, 197, 0); }
+  }
+
+  .tagline {
+    color: var(--text-dim);
+    font-size: 15px;
+    margin: 10px 0 0;
+    max-width: 620px;
+    line-height: 1.5;
+  }
+
+  .stat-bar {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1px;
+    background: var(--hairline);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    overflow: hidden;
+    max-width: 1180px;
+    margin: 28px auto 0;
+  }
+
+  .stat {
+    background: var(--surface);
+    padding: 18px 16px;
+  }
+
+  .stat .n {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .stat .l {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 8px;
+  }
+
+  .stat .sub {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-faint);
+    margin-top: 3px;
+  }
+
+  main { max-width: 1180px; margin: 0 auto; padding: 28px 32px 80px; }
+
+  nav.tabs {
+    display: flex;
+    gap: 4px;
+    border-bottom: 1px solid var(--hairline);
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  nav.tabs button {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    letter-spacing: 0.03em;
+    padding: 11px 16px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s;
+  }
+
+  nav.tabs button:hover { color: var(--text); }
+
+  nav.tabs button.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .search-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    gap: 12px;
+  }
+
+  input[type="text"] {
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    color: var(--text);
+    padding: 9px 12px;
+    border-radius: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    width: 280px;
+  }
+  input[type="text"]:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+  input[type="text"]::placeholder { color: var(--text-faint); }
+
+  .count-note {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    color: var(--text-faint);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  thead th {
+    text-align: left;
+    color: var(--text-faint);
+    font-weight: 500;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--hairline);
+    white-space: nowrap;
+  }
+
+  tbody td {
+    padding: 11px 12px;
+    border-bottom: 1px solid var(--surface-2);
+    color: var(--text);
+    vertical-align: top;
+  }
+
+  tbody tr:hover { background: var(--surface); }
+
+  td.mono, .mono { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-dim); }
+
+  a { color: var(--accent-2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .badge {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    padding: 2px 8px;
+    border-radius: 100px;
+    border: 1px solid;
+  }
+  .badge.free { color: var(--accent-2); border-color: rgba(79,209,197,0.4); background: rgba(79,209,197,0.08); }
+  .badge.paid { color: var(--accent); border-color: rgba(232,163,61,0.4); background: rgba(232,163,61,0.08); }
+  .badge.null { color: var(--text-faint); border-color: var(--hairline); }
+
+  .bars {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 28px;
+  }
+  .bar-card {
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+  }
+  .bar-card h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    margin: 0 0 14px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
+  .bar-row .label { width: 90px; font-size: 12px; color: var(--text-dim); flex-shrink: 0; }
+  .bar-row .track { flex: 1; height: 8px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
+  .bar-row .fill { height: 100%; background: var(--accent); border-radius: 4px; }
+  .bar-row .val { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: var(--text-faint); width: 32px; text-align: right; }
+
+  .empty-state {
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--text-faint);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    border: 1px dashed var(--hairline);
+    border-radius: var(--radius);
+  }
+
+  footer {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 20px 32px 40px;
+    color: var(--text-faint);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    border-top: 1px solid var(--hairline);
+  }
+
+  @media (max-width: 800px) {
+    .stat-bar { grid-template-columns: repeat(3, 1fr); }
+    .bars { grid-template-columns: 1fr; }
+    table { font-size: 12px; }
+    thead th:nth-child(n+4), tbody td:nth-child(n+4) { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="sweep"></div>
+
+<header>
+  <div class="wordmark">
+    <h1>AI <span>SIGNAL</span></h1>
+    <span class="live-badge"><span class="pulse-dot"></span>Live pipeline output</span>
+  </div>
+  <p class="tagline">Intelligence graph for the AI &amp; venture ecosystem — startups, products, research papers, jobs, and news, continuously ingested and resolved to canonical entities.</p>
+
+  <div class="stat-bar" id="statBar"></div>
+</header>
+
+<main>
+  <nav class="tabs" id="tabs">
+    <button data-tab="overview" class="active">Overview</button>
+    <button data-tab="startups">Startups</button>
+    <button data-tab="products">Products</button>
+    <button data-tab="papers">Research Papers</button>
+    <button data-tab="jobs">Jobs</button>
+    <button data-tab="news">News</button>
+    <button data-tab="entities">Entity Resolution</button>
+  </nav>
+
+  <div class="panel active" id="panel-overview">
+    <div class="bars">
+      <div class="bar-card"><h3>Product pricing model</h3><div id="pricingBars"></div></div>
+      <div class="bar-card"><h3>Job role family</h3><div id="roleBars"></div></div>
+    </div>
+    <div class="bar-card">
+      <h3>What this is</h3>
+      <p style="color:var(--text-dim); font-size:13px; line-height:1.6; margin:0;">
+        This dashboard reads directly from the pipeline's own SQLite output — nothing here is hand-entered.
+        Every startup, product, and paper row links to its real source URL. News and jobs are filtered to a strict
+        24-hour freshness window, so those tabs are intentionally small on any single run. See the linked GitHub
+        repository for the full pipeline source, test suite, and architecture writeup.
+      </p>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-startups">
+    <div class="search-row">
+      <input type="text" id="search-startups" placeholder="Filter by name…">
+      <span class="count-note" id="count-startups"></span>
+    </div>
+    <div id="table-startups"></div>
+  </div>
+
+  <div class="panel" id="panel-products">
+    <div class="search-row">
+      <input type="text" id="search-products" placeholder="Filter by name…">
+      <span class="count-note" id="count-products"></span>
+    </div>
+    <div id="table-products"></div>
+  </div>
+
+  <div class="panel" id="panel-papers">
+    <div class="search-row">
+      <input type="text" id="search-papers" placeholder="Filter by title or author…">
+      <span class="count-note" id="count-papers"></span>
+    </div>
+    <div id="table-papers"></div>
+  </div>
+
+  <div class="panel" id="panel-jobs">
+    <div class="search-row">
+      <input type="text" id="search-jobs" placeholder="Filter by company or role…">
+      <span class="count-note" id="count-jobs"></span>
+    </div>
+    <div id="table-jobs"></div>
+  </div>
+
+  <div class="panel" id="panel-news">
+    <div class="search-row">
+      <input type="text" id="search-news" placeholder="Filter by title…">
+      <span class="count-note" id="count-news"></span>
+    </div>
+    <div id="table-news"></div>
+  </div>
+
+  <div class="panel" id="panel-entities">
+    <div class="search-row">
+      <input type="text" id="search-entities" placeholder="Filter by name…">
+      <span class="count-note" id="count-entities"></span>
+    </div>
+    <div id="table-entities"></div>
+  </div>
+</main>
+
+<footer>
+  AI SIGNAL — DATA INTELLIGENCE PIPELINE · STATIC SNAPSHOT · REGENERATE VIA <span style="color:var(--text-dim)">export_dashboard_data.py</span>
+</footer>
+
+<script>
+const state = { startups: [], products: [], papers: [], jobs: [], news: [], entities: [], summary: {} };
+
+async function loadAll() {
+  const [startups, products, papers, jobs, news, entities, summary] = await Promise.all([
+    fetchJson('data/startups.json'), fetchJson('data/products.json'), fetchJson('data/papers.json'),
+    fetchJson('data/jobs.json'), fetchJson('data/news.json'), fetchJson('data/entity_mappings.json'),
+    fetchJson('data/summary.json'),
+  ]);
+  Object.assign(state, { startups, products, papers, jobs, news, entities, summary });
+  renderStatBar();
+  renderOverviewCharts();
+  renderStartups(); renderProducts(); renderPapers(); renderJobs(); renderNews(); renderEntities();
+}
+
+async function fetchJson(path) {
+  try {
+    const res = await fetch(path);
+    if (!res.ok) throw new Error(res.status);
+    return await res.json();
+  } catch (e) {
+    console.warn('Could not load', path, e);
+    return Array.isArray(state[path]) ? [] : {};
+  }
+}
+
+function esc(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function renderStatBar() {
+  const s = state.summary;
+  const stats = [
+    { n: s.startups ?? '—', l: 'Startups' },
+    { n: s.products ?? '—', l: 'Products', sub: s.productsWithPricing != null ? `${s.productsWithPricing} priced` : '' },
+    { n: s.papers ?? '—', l: 'Research papers', sub: s.papersWithGithubStars != null ? `${s.papersWithGithubStars} w/ stars` : '' },
+    { n: s.news ?? '—', l: 'News (24h)' },
+    { n: s.jobs ?? '—', l: 'Jobs (24h)' },
+    { n: s.entityMappingsResolved ?? '—', l: 'Entities resolved', sub: s.entityMappingsTotal != null ? `of ${s.entityMappingsTotal} checked` : '' },
+  ];
+  document.getElementById('statBar').innerHTML = stats.map(st => `
+    <div class="stat"><div class="n">${esc(st.n)}</div><div class="l">${esc(st.l)}</div>${st.sub ? `<div class="sub">${esc(st.sub)}</div>` : ''}</div>
+  `).join('');
+}
+
+function renderOverviewCharts() {
+  const pricingCounts = {};
+  state.products.forEach(p => {
+    const v = p.content?.pricingModel || 'Unclassified';
+    pricingCounts[v] = (pricingCounts[v] || 0) + 1;
+  });
+  renderBarGroup('pricingBars', pricingCounts);
+
+  const roleCounts = {};
+  state.jobs.forEach(j => {
+    const v = j.content?.role_family || 'Unclassified';
+    roleCounts[v] = (roleCounts[v] || 0) + 1;
+  });
+  renderBarGroup('roleBars', roleCounts);
+}
+
+function renderBarGroup(elId, counts) {
+  const el = document.getElementById(elId);
+  const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  if (!entries.length) { el.innerHTML = '<div class="empty-state">No data yet</div>'; return; }
+  const max = Math.max(...entries.map(e => e[1]));
+  el.innerHTML = entries.map(([label, val]) => `
+    <div class="bar-row">
+      <div class="label">${esc(label)}</div>
+      <div class="track"><div class="fill" style="width:${(val / max * 100).toFixed(0)}%"></div></div>
+      <div class="val">${val}</div>
+    </div>
+  `).join('');
+}
+
+function pricingBadge(v) {
+  if (!v) return '<span class="badge null">—</span>';
+  const cls = v === 'FREE' || v === 'FREEMIUM' ? 'free' : 'paid';
+  return `<span class="badge ${cls}">${esc(v)}</span>`;
+}
+
+function tableOrEmpty(rows, html) {
+  return rows.length ? html : '<div class="empty-state">No records in this snapshot yet — run the pipeline and regenerate the export.</div>';
+}
+
+function renderStartups(filter = '') {
+  const rows = state.startups.filter(r => (r.content?.entityName || '').toLowerCase().includes(filter.toLowerCase()));
+  document.getElementById('count-startups').textContent = `${rows.length} of ${state.startups.length}`;
+  document.getElementById('table-startups').innerHTML = tableOrEmpty(rows, `
+    <table><thead><tr><th>Name</th><th>Employees</th><th>Source</th></tr></thead><tbody>
+      ${rows.map(r => `<tr>
+        <td>${esc(r.content?.entityName)}</td>
+        <td class="mono">${r.content?.data?.employeeCount ?? '—'}</td>
+        <td><a href="${esc(r.source?.url)}" target="_blank" rel="noopener">${esc(r.source?.name)} ↗</a></td>
+      </tr>`).join('')}
+    </tbody></table>
+  `);
+}
+
+function renderProducts(filter = '') {
+  const rows = state.products.filter(r => (r.content?.startupName || '').toLowerCase().includes(filter.toLowerCase()));
+  document.getElementById('count-products').textContent = `${rows.length} of ${state.products.length}`;
+  document.getElementById('table-products').innerHTML = tableOrEmpty(rows, `
+    <table><thead><tr><th>Name</th><th>Pricing</th><th>Source</th></tr></thead><tbody>
+      ${rows.map(r => `<tr>
+        <td>${esc(r.content?.startupName)}</td>
+        <td>${pricingBadge(r.content?.pricingModel)}</td>
+        <td><a href="${esc(r.source?.url)}" target="_blank" rel="noopener">${esc(r.source?.name)} ↗</a></td>
+      </tr>`).join('')}
+    </tbody></table>
+  `);
+}
+
+function renderPapers(filter = '') {
+  const f = filter.toLowerCase();
+  const rows = state.papers.filter(r =>
+    (r.content?.title || '').toLowerCase().includes(f) ||
+    (r.content?.authors || []).join(' ').toLowerCase().includes(f)
+  );
+  document.getElementById('count-papers').textContent = `${rows.length} of ${state.papers.length}`;
+  document.getElementById('table-papers').innerHTML = tableOrEmpty(rows, `
+    <table><thead><tr><th>Title</th><th>Authors</th><th>GitHub ★</th><th>Source</th></tr></thead><tbody>
+      ${rows.map(r => `<tr>
+        <td>${esc(r.content?.title)}</td>
+        <td class="mono">${esc((r.content?.authors || []).slice(0,2).join(', '))}${(r.content?.authors||[]).length>2?' +'+(r.content.authors.length-2):''}</td>
+        <td class="mono">${r.content?.github_stars != null ? '★ ' + r.content.github_stars : '—'}</td>
+        <td><a href="${esc(r.content?.paper_url || r.source?.url)}" target="_blank" rel="noopener">Arxiv ↗</a></td>
+      </tr>`).join('')}
+    </tbody></table>
+  `);
+}
+
+function renderJobs(filter = '') {
+  const f = filter.toLowerCase();
+  const rows = state.jobs.filter(r =>
+    (r.content?.company || '').toLowerCase().includes(f) || (r.content?.role_family || '').toLowerCase().includes(f)
+  );
+  document.getElementById('count-jobs').textContent = `${rows.length} of ${state.jobs.length}`;
+  document.getElementById('table-jobs').innerHTML = tableOrEmpty(rows, `
+    <table><thead><tr><th>Company</th><th>Role family</th><th>Remote</th><th>Source</th></tr></thead><tbody>
+      ${rows.map(r => `<tr>
+        <td>${esc(r.content?.company)}</td>
+        <td class="mono">${esc(r.content?.role_family || '—')}</td>
+        <td class="mono">${r.content?.is_remote === true ? 'Yes' : r.content?.is_remote === false ? 'No' : '—'}</td>
+        <td><a href="${esc(r.source?.url)}" target="_blank" rel="noopener">${esc(r.source?.name)} ↗</a></td>
+      </tr>`).join('')}
+    </tbody></table>
+  `);
+}
+
+function renderNews(filter = '') {
+  const rows = state.news.filter(r => (r.content?.title || '').toLowerCase().includes(filter.toLowerCase()));
+  document.getElementById('count-news').textContent = `${rows.length} of ${state.news.length}`;
+  document.getElementById('table-news').innerHTML = tableOrEmpty(rows, `
+    <table><thead><tr><th>Title</th><th>Published</th><th>Source</th></tr></thead><tbody>
+      ${rows.map(r => `<tr>
+        <td>${esc(r.content?.title)}</td>
+        <td class="mono">${esc((r.content?.publishedDate || '').slice(0,16).replace('T',' '))}</td>
+        <td><a href="${esc(r.source?.url)}" target="_blank" rel="noopener">${esc(r.source?.name)} ↗</a></td>
+      </tr>`).join('')}
+    </tbody></table>
+  `);
+}
+
+function renderEntities(filter = '') {
+  const f = filter.toLowerCase();
+  const rows = state.entities.filter(r => (r.raw || '').toLowerCase().includes(f) || (r.canonical || '').toLowerCase().includes(f));
+  document.getElementById('count-entities').textContent = `${rows.length} of ${state.entities.length}`;
+  document.getElementById('table-entities').innerHTML = tableOrEmpty(rows, `
+    <table><thead><tr><th>Raw name</th><th>Canonical name</th><th>Confidence</th></tr></thead><tbody>
+      ${rows.map(r => `<tr>
+        <td>${esc(r.raw)}</td>
+        <td>${esc(r.canonical)}</td>
+        <td class="mono">${r.confidence != null ? r.confidence.toFixed(2) : '—'}</td>
+      </tr>`).join('')}
+    </tbody></table>
+  `);
+}
+
+document.getElementById('tabs').addEventListener('click', e => {
+  const btn = e.target.closest('button[data-tab]');
+  if (!btn) return;
+  document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+});
+
+['startups','products','papers','jobs','news','entities'].forEach(name => {
+  document.getElementById('search-' + name).addEventListener('input', e => {
+    ({startups: renderStartups, products: renderProducts, papers: renderPapers, jobs: renderJobs, news: renderNews, entities: renderEntities})[name](e.target.value);
+  });
+});
+
+loadAll();
+</script>
+</body>
+</html>
