@@ -1,4 +1,4 @@
-# AI Signal — Data Intelligence Pipeline (Trial Assignment)
+# AI Signal — Data Intelligence Pipelines (Trial Assignment)
 
 ## Status
 Implemented and tested (schema/DB/logic layers; live network runs happen on
