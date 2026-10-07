@@ -1,6 +1,6 @@
 # Results Summary
 
-A quick-scan summary of what this pipeline actually produced, for anyone
+A quick-scan summary of what this pipeline actually have produced, for anyone
 reviewing this submission without wanting to dig through logs first. Full
 detail lives in `README.md` (setup/architecture) and `architecture.pdf`
 (scale/design decisions).
