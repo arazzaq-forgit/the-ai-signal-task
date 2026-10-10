@@ -99,7 +99,7 @@ All 73 tests run against an isolated temporary SQLite file per test (see
 
 Not yet built: Google Sheets export, Phase VI architecture doc.
 
-## Setup
+### Setup
 ```bash
 python3 -m venv venv
 source venv/bin/activate
