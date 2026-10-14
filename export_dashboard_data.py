@@ -1,7 +1,7 @@
 """
 Exports data/state.db into static JSON files under docs/data/, which
 the deployed dashboard (docs/index.html) fetches directly. Run this
-once after your pipelines have populated the database, then commit the
+once after your pipelines have populated the database and then commit the
 docs/ folder — GitHub Pages serves directly from it.
 
 Usage: python export_dashboard_data.py
